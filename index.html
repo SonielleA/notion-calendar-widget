@@ -7,11 +7,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:italic,wght@600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
     :root {
+      /* Light Mode Palette */
       --bg: #faf9f6;
+      --cal-bg: #ffffff;
       --accent-green: #8e9775;
       --text-main: #1a1a1a;
       --text-dim: #999;
-      --border-dark: #888; /* Darker border for the buttons */
+      --border-dark: #888;
+      --hover-bg: #f5f5f5;
+    }
+
+    /* Dark Mode Palette */
+    [data-theme="dark"] {
+      --bg: #121212;
+      --cal-bg: #1e1e1e;
+      --text-main: #f0f0f0;
+      --text-dim: #777;
+      --border-dark: #555;
+      --hover-bg: #2a2a2a;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -19,20 +32,42 @@
     body {
       background: var(--bg);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       font-family: 'Inter', sans-serif;
       color: var(--text-main);
+      transition: background 0.3s ease;
+    }
+
+    /* Theme Switcher Styles */
+    .theme-toggle {
+      margin-bottom: 20px;
+      background: none;
+      border: 1px solid var(--border-dark);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .theme-toggle:hover {
+      background: var(--hover-bg);
     }
 
     .cal {
       width: 100%;
       max-width: 380px;
-      background: #fff;
+      background: var(--cal-bg);
       padding: 2.5rem;
       border-radius: 4px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.05);
+      transition: background 0.3s ease;
     }
 
     .cal-header {
@@ -60,9 +95,9 @@
 
     .nav-btn {
       background: none;
-      border: 1.5px solid var(--border-dark); /* Darker border */
+      border: 1.5px solid var(--border-dark);
       cursor: pointer;
-      color: #333; /* Darker arrows */
+      color: var(--text-main);
       width: 36px;
       height: 36px;
       border-radius: 10px;
@@ -75,8 +110,8 @@
     }
 
     .nav-btn:hover {
-      background: #f0f0f0;
-      border-color: #111;
+      background: var(--hover-bg);
+      border-color: var(--text-main);
     }
 
     .cal-subtitle {
@@ -113,16 +148,15 @@
       cursor: pointer;
       border: 1.5px solid transparent;
       font-weight: 400;
+      color: var(--text-main);
     }
 
-    /* Today highlight - Green background, white text */
     .day-cell.today {
       background: var(--accent-green);
       color: #ffffff !important;
       font-weight: 600;
     }
 
-    /* Selected day highlight - Green border */
     .day-cell.selected {
       border-color: var(--accent-green);
       color: var(--accent-green);
@@ -130,7 +164,7 @@
     }
 
     .day-cell.active:hover:not(.today) {
-      background: #f5f5f5;
+      background: var(--hover-bg);
     }
 
     .day-cell.empty {
@@ -139,6 +173,8 @@
   </style>
 </head>
 <body>
+
+<button class="theme-toggle" id="theme-btn">Switch Theme</button>
 
 <div class="cal">
   <div class="cal-header">
@@ -169,6 +205,16 @@
   let cur = { y: now.getFullYear(), m: now.getMonth() };
   let selectedDate = null; 
 
+  // --- Theme Toggle Logic ---
+  const themeBtn = document.getElementById('theme-btn');
+  themeBtn.onclick = () => {
+    const currentTheme = document.documentElement.getAttribute('data-theme');
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', nextTheme);
+    themeBtn.textContent = nextTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
+  };
+
+  // --- Calendar Logic ---
   function render() {
     const { y, m } = cur;
     document.getElementById('month-title').textContent = MONTHS[m];
