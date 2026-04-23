@@ -32,32 +32,12 @@
     body {
       background: var(--bg);
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
       min-height: 100vh;
       font-family: 'Inter', sans-serif;
       color: var(--text-main);
       transition: background 0.3s ease;
-    }
-
-    /* Theme Switcher Styles */
-    .theme-toggle {
-      margin-bottom: 20px;
-      background: none;
-      border: 1px solid var(--border-dark);
-      color: var(--text-main);
-      padding: 6px 14px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
-    .theme-toggle:hover {
-      background: var(--hover-bg);
     }
 
     .cal {
@@ -68,6 +48,8 @@
       border-radius: 4px;
       box-shadow: 0 10px 40px rgba(0,0,0,0.05);
       transition: background 0.3s ease;
+      display: flex;
+      flex-direction: column;
     }
 
     .cal-header {
@@ -170,11 +152,34 @@
     .day-cell.empty {
       pointer-events: none;
     }
+
+    /* Theme Switcher at bottom of card */
+    .theme-toggle-container {
+      margin-top: 2rem;
+      text-align: center;
+    }
+
+    .theme-toggle {
+      background: none;
+      border: none;
+      color: var(--text-dim);
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      padding: 5px;
+      transition: color 0.2s ease;
+    }
+
+    .theme-toggle:hover {
+      color: var(--text-main);
+      text-decoration: underline;
+      text-underline-offset: 4px;
+    }
   </style>
 </head>
 <body>
-
-<button class="theme-toggle" id="theme-btn">Switch Theme</button>
 
 <div class="cal">
   <div class="cal-header">
@@ -187,6 +192,7 @@
     </div>
     <div class="cal-subtitle" id="subtitle"></div>
   </div>
+
   <div class="cal-grid">
     <div class="day-label">M</div>
     <div class="day-label">T</div>
@@ -196,6 +202,10 @@
     <div class="day-label">S</div>
     <div class="day-label">S</div>
     <div id="days" style="display: contents;"></div>
+  </div>
+
+  <div class="theme-toggle-container">
+    <button class="theme-toggle" id="theme-btn">Switch Theme</button>
   </div>
 </div>
 
@@ -208,8 +218,8 @@
   // --- Theme Toggle Logic ---
   const themeBtn = document.getElementById('theme-btn');
   themeBtn.onclick = () => {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
-    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const nextTheme = isDark ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', nextTheme);
     themeBtn.textContent = nextTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
   };
