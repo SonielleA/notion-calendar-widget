@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <style>
+        :root {
+            --bg-color: transparent;
+            --text-main: #000000;
+            --text-muted: #9ca3af;
+            --border-color: #e5e7eb;
+            --today-bg: #000000;
+            --today-text: #ffffff;
+            --nav-border: #f3f4f6;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-main: #ffffff;
+                --text-muted: #6b7280;
+                --border-color: #374151;
+                --today-bg: #ffffff;
+                --today-text: #000000;
+                --nav-border: #1f2937;
+            }
+        }
+
+        body {
+            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .calendar-card {
+            width: 260px;
+            padding: 18px;
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            user-select: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-label {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .nav-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--nav-border);
+            border-radius: 6px;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.75rem;
+            padding-bottom: 12px;
+        }
+
+        td {
+            text-align: center;
+            padding: 6px 0;
+            font-size: 0.9rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+        }
+
+        .today {
+            background-color: var(--today-bg);
+            color: var(--today-text);
+            font-weight: 700;
+        }
+
+        .fade {
+            color: var(--text-muted);
+            opacity: 0.35;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calendar-card">
+    <div class="header">
+        <div class="month-label" id="monthYear"></div>
+        <div class="nav-btns">
+            <div class="btn">‹</div>
+            <div class="btn">›</div>
+        </div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th>
+            </tr>
+        </thead>
+        <tbody id="calendarDays"></tbody>
+    </table>
+</div>
+
+<script>
+    function generateCalendar() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const today = now.getDate();
+
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        document.getElementById('monthYear').innerText = `${months[month]} ${year}`;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const prevMonthLastDay = new Date(year, month, 0).getDate();
+
+        // Adjust for Monday start
+        const startOffset = firstDay === 0 ? 6 : firstDay - 1;
+        
+        const grid = document.getElementById('calendarDays');
+        let html = '<tr>';
+        
+        // Fill previous month days
+        for (let i = 0; i < startOffset; i++) {
+            html += `<td class="fade">${prevMonthLastDay - startOffset + i + 1}</td>`;
+        }
+
+        // Fill current month days
+        let dayCounter = 1;
+        for (let i = startOffset; i < 42; i++) {
+            if (i % 7 === 0 && i !== 0) html += '</tr><tr>';
+
+            if (dayCounter <= daysInMonth) {
+                const isToday = dayCounter === today ? 'class="today"' : '';
+                html += `<td ${isToday}>${dayCounter}</td>`;
+                dayCounter++;
+            } else {
+                // Fill next month days
+                html += `<td class="fade">${dayCounter - daysInMonth}</td>`;
+                dayCounter++;
+            }
+        }
+        grid.innerHTML = html + '</tr>';
+    }
+    generateCalendar();
+</script>
+</body>
+</html>
