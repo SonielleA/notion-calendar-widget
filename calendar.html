@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        /* CSS VARIABLE "IF/THEN" LOGIC */
+        :root {
+            --text-main: #000000;      /* Light mode: Black text */
+            --text-muted: #adadad;
+            --today-bg: #1a1a1a;       /* Light mode: Black box */
+            --today-text: #ffffff;
+            --nav-border: #e0e0e0;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --text-main: #ffffff;  /* Dark mode: White text */
+                --text-muted: #666666;
+                --today-bg: #37352f;   /* Dark mode: Notion grey box */
+                --today-text: #ffffff;
+                --nav-border: #3f3f3f;
+            }
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: transparent;
+            color: var(--text-main);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .calendar {
+            width: 260px;
+            user-select: none;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .month-year {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .nav-btn {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            padding: 4px 10px;
+            border: 1px solid var(--nav-border);
+            border-radius: 8px;
+            line-height: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 400;
+            font-size: 0.8rem;
+            padding-bottom: 12px;
+            text-transform: capitalize;
+        }
+
+        td {
+            text-align: center;
+            padding: 6px 0;
+            font-size: 0.95rem;
+            width: 38px;
+            height: 38px;
+        }
+
+        .prev-month, .next-month {
+            color: var(--text-muted);
+            opacity: 0.4;
+        }
+
+        .today {
+            background-color: var(--today-bg);
+            color: var(--today-text);
+            border-radius: 10px; /* Matching the rounded corners from your image */
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+
+<div class="calendar">
+    <div class="header">
+        <div class="nav-btn">‹</div>
+        <div class="month-year" id="label"></div>
+        <div class="nav-btn">›</div>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th>
+            </tr>
+        </thead>
+        <tbody id="days"></tbody>
+    </table>
+</div>
+
+<script>
+    function renderCalendar() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        const today = now.getDate();
+
+        const monthNames = ["January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"];
+        
+        document.getElementById('label').textContent = `${monthNames[month]} ${year}`;
+
+        const firstDay = new Date(year, month, 1).getDay();
+        const daysInMonth = new Date(year, month + 1, 0).getDate();
+        const daysInPrevMonth = new Date(year, month, 0).getDate();
+
+        // Monday start logic
+        let startDay = firstDay === 0 ? 6 : firstDay - 1;
+        
+        const tbody = document.getElementById('days');
+        let html = '';
+        let date = 1;
+        let nextDate = 1;
+
+        for (let i = 0; i < 6; i++) {
+            html += '<tr>';
+            for (let j = 0; j < 7; j++) {
+                if (i === 0 && j < startDay) {
+                    html += `<td class="prev-month">${daysInPrevMonth - startDay + j + 1}</td>`;
+                } else if (date > daysInMonth) {
+                    html += `<td class="next-month">${nextDate++}</td>`;
+                } else {
+                    const isToday = (date === today) ? 'class="today"' : '';
+                    html += `<td ${isToday}>${date}</td>`;
+                    date++;
+                }
+            }
+            html += '</tr>';
+            if (date > daysInMonth) break;
+        }
+        tbody.innerHTML = html;
+    }
+    renderCalendar();
+</script>
+</body>
+</html>
