@@ -1,16 +1,14 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
     <style>
         :root {
-            --bg-color: transparent;
             --text-main: #000000;
             --text-muted: #9ca3af;
             --border-color: #e5e7eb;
-            --today-bg: #000000;
+            --today-bg: #1a1a1a;
             --today-text: #ffffff;
-            --nav-border: #f3f4f6;
+            --hover-bg: #f3f4f6;
         }
 
         @media (prefers-color-scheme: dark) {
@@ -20,27 +18,26 @@
                 --border-color: #374151;
                 --today-bg: #ffffff;
                 --today-text: #000000;
-                --nav-border: #1f2937;
+                --hover-bg: #2d2d2d;
             }
         }
 
         body {
-            font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: transparent;
             color: var(--text-main);
             margin: 0;
             display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
-            overflow: hidden;
         }
 
         .calendar-card {
             width: 260px;
-            padding: 18px;
+            padding: 16px;
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 12px;
             user-select: none;
         }
 
@@ -48,62 +45,52 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        .month-label {
-            font-weight: 600;
-            font-size: 1rem;
-        }
+        .month-label { font-weight: 600; font-size: 1rem; }
 
-        .nav-btns {
-            display: flex;
-            gap: 8px;
-        }
+        .nav-btns { display: flex; gap: 5px; }
 
         .btn {
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border: 1px solid var(--nav-border);
+            border: 1px solid var(--border-color);
             border-radius: 6px;
-            color: var(--text-muted);
-            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-size: 1.1rem;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+        .btn:hover { background: var(--hover-bg); }
+
+        table { width: 100%; border-collapse: collapse; }
 
         th {
             color: var(--text-muted);
             font-weight: 500;
             font-size: 0.75rem;
-            padding-bottom: 12px;
+            padding-bottom: 10px;
         }
 
         td {
             text-align: center;
-            padding: 6px 0;
             font-size: 0.9rem;
-            width: 36px;
-            height: 36px;
+            width: 35px;
+            height: 35px;
             border-radius: 8px;
         }
 
         .today {
             background-color: var(--today-bg);
             color: var(--today-text);
-            font-weight: 700;
+            font-weight: bold;
         }
 
-        .fade {
-            color: var(--text-muted);
-            opacity: 0.35;
-        }
+        .fade { color: var(--text-muted); opacity: 0.3; }
     </style>
 </head>
 <body>
@@ -112,26 +99,25 @@
     <div class="header">
         <div class="month-label" id="monthYear"></div>
         <div class="nav-btns">
-            <div class="btn">‹</div>
-            <div class="btn">›</div>
+            <div class="btn" onclick="changeMonth(-1)">‹</div>
+            <div class="btn" onclick="changeMonth(1)">›</div>
         </div>
     </div>
     <table>
         <thead>
-            <tr>
-                <th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th>
-            </tr>
+            <tr><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th></tr>
         </thead>
         <tbody id="calendarDays"></tbody>
     </table>
 </div>
 
 <script>
-    function generateCalendar() {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = now.getMonth();
-        const today = now.getDate();
+    let currentDisplayDate = new Date();
+
+    function render() {
+        const year = currentDisplayDate.getFullYear();
+        const month = currentDisplayDate.getMonth();
+        const realToday = new Date();
 
         const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
         document.getElementById('monthYear').innerText = `${months[month]} ${year}`;
@@ -140,35 +126,41 @@
         const daysInMonth = new Date(year, month + 1, 0).getDate();
         const prevMonthLastDay = new Date(year, month, 0).getDate();
 
-        // Adjust for Monday start
         const startOffset = firstDay === 0 ? 6 : firstDay - 1;
-        
         const grid = document.getElementById('calendarDays');
+        grid.innerHTML = "";
+
         let html = '<tr>';
         
-        // Fill previous month days
+        // Prev Month
         for (let i = 0; i < startOffset; i++) {
             html += `<td class="fade">${prevMonthLastDay - startOffset + i + 1}</td>`;
         }
 
-        // Fill current month days
-        let dayCounter = 1;
-        for (let i = startOffset; i < 42; i++) {
-            if (i % 7 === 0 && i !== 0) html += '</tr><tr>';
-
-            if (dayCounter <= daysInMonth) {
-                const isToday = dayCounter === today ? 'class="today"' : '';
-                html += `<td ${isToday}>${dayCounter}</td>`;
-                dayCounter++;
-            } else {
-                // Fill next month days
-                html += `<td class="fade">${dayCounter - daysInMonth}</td>`;
-                dayCounter++;
-            }
+        // Current Month
+        for (let day = 1; day <= daysInMonth; day++) {
+            if ((day + startOffset - 1) % 7 === 0 && day !== 1) html += '</tr><tr>';
+            
+            const isToday = (day === realToday.getDate() && month === realToday.getMonth() && year === realToday.getFullYear()) ? 'class="today"' : '';
+            html += `<td ${isToday}>${day}</td>`;
         }
+
+        // Next Month padding to fill 6 rows
+        let remainingCells = 42 - (daysInMonth + startOffset);
+        for (let i = 1; i <= remainingCells; i++) {
+            if ((daysInMonth + startOffset + i - 1) % 7 === 0) html += '</tr><tr>';
+            html += `<td class="fade">${i}</td>`;
+        }
+
         grid.innerHTML = html + '</tr>';
     }
-    generateCalendar();
+
+    function changeMonth(step) {
+        currentDisplayDate.setMonth(currentDisplayDate.getMonth() + step);
+        render();
+    }
+
+    render();
 </script>
 </body>
 </html>
