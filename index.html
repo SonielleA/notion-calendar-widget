@@ -1,166 +1,230 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <style>
-        :root {
-            --text-main: #000000;
-            --text-muted: #9ca3af;
-            --border-color: #e5e7eb;
-            --today-bg: #1a1a1a;
-            --today-text: #ffffff;
-            --hover-bg: #f3f4f6;
-        }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aesthetic Calendar Final</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:italic,wght@600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #faf9f6;
+      --accent-green: #8e9775;
+      --text-main: #1a1a1a;
+      --text-dim: #999;
+      --border-dark: #888; /* Darker border for the buttons */
+    }
 
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --text-main: #ffffff;
-                --text-muted: #6b7280;
-                --border-color: #374151;
-                --today-bg: #ffffff;
-                --today-text: #000000;
-                --hover-bg: #2d2d2d;
-            }
-        }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: transparent;
-            color: var(--text-main);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
+    body {
+      background: var(--bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
+      color: var(--text-main);
+    }
 
-        .calendar-card {
-            width: 260px;
-            padding: 16px;
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            user-select: none;
-        }
+    .cal {
+      width: 100%;
+      max-width: 380px;
+      background: #fff;
+      padding: 2.5rem;
+      border-radius: 4px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.02);
+    }
 
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-        }
+    .cal-header {
+      margin-bottom: 1.5rem;
+    }
 
-        .month-label { font-weight: 600; font-size: 1rem; }
+    .cal-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.2rem;
+    }
 
-        .nav-btns { display: flex; gap: 5px; }
+    .cal-month {
+      font-family: 'Playfair Display', serif;
+      font-size: 36px;
+      font-style: italic;
+      font-weight: 600;
+    }
 
-        .btn {
-            width: 28px;
-            height: 28px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 1px solid var(--border-color);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: background 0.2s;
-            font-size: 1.1rem;
-        }
+    .nav-group {
+      display: flex;
+      gap: 12px;
+    }
 
-        .btn:hover { background: var(--hover-bg); }
+    .nav-btn {
+      background: none;
+      border: 1.5px solid var(--border-dark); /* Darker border */
+      cursor: pointer;
+      color: #333; /* Darker arrows */
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
 
-        table { width: 100%; border-collapse: collapse; }
+    .nav-btn:hover {
+      background: #f0f0f0;
+      border-color: #111;
+    }
 
-        th {
-            color: var(--text-muted);
-            font-weight: 500;
-            font-size: 0.75rem;
-            padding-bottom: 10px;
-        }
+    .cal-subtitle {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      color: var(--text-dim);
+      text-transform: uppercase;
+    }
 
-        td {
-            text-align: center;
-            font-size: 0.9rem;
-            width: 35px;
-            height: 35px;
-            border-radius: 8px;
-        }
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      margin-top: 1.5rem;
+    }
 
-        .today {
-            background-color: var(--today-bg);
-            color: var(--today-text);
-            font-weight: bold;
-        }
+    .day-label {
+      font-size: 10px;
+      text-align: center;
+      padding-bottom: 12px;
+      color: var(--text-dim);
+      font-weight: 700;
+    }
 
-        .fade { color: var(--text-muted); opacity: 0.3; }
-    </style>
+    .day-cell {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      border-radius: 10px;
+      transition: all 0.2s ease;
+      cursor: pointer;
+      border: 1.5px solid transparent;
+      font-weight: 400;
+    }
+
+    /* Today highlight - Green background, white text */
+    .day-cell.today {
+      background: var(--accent-green);
+      color: #ffffff !important;
+      font-weight: 600;
+    }
+
+    /* Selected day highlight - Green border */
+    .day-cell.selected {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      font-weight: 600;
+    }
+
+    .day-cell.active:hover:not(.today) {
+      background: #f5f5f5;
+    }
+
+    .day-cell.empty {
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
 
-<div class="calendar-card">
-    <div class="header">
-        <div class="month-label" id="monthYear"></div>
-        <div class="nav-btns">
-            <div class="btn" onclick="changeMonth(-1)">‹</div>
-            <div class="btn" onclick="changeMonth(1)">›</div>
-        </div>
+<div class="cal">
+  <div class="cal-header">
+    <div class="cal-title-row">
+      <span class="cal-month" id="month-title"></span>
+      <div class="nav-group">
+        <button class="nav-btn" id="prev">＜</button>
+        <button class="nav-btn" id="next">＞</button>
+      </div>
     </div>
-    <table>
-        <thead>
-            <tr><th>Mo</th><th>Tu</th><th>We</th><th>Th</th><th>Fr</th><th>Sa</th><th>Su</th></tr>
-        </thead>
-        <tbody id="calendarDays"></tbody>
-    </table>
+    <div class="cal-subtitle" id="subtitle"></div>
+  </div>
+  <div class="cal-grid">
+    <div class="day-label">M</div>
+    <div class="day-label">T</div>
+    <div class="day-label">W</div>
+    <div class="day-label">T</div>
+    <div class="day-label">F</div>
+    <div class="day-label">S</div>
+    <div class="day-label">S</div>
+    <div id="days" style="display: contents;"></div>
+  </div>
 </div>
 
 <script>
-    let currentDisplayDate = new Date();
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const now = new Date();
+  let cur = { y: now.getFullYear(), m: now.getMonth() };
+  let selectedDate = null; 
 
-    function render() {
-        const year = currentDisplayDate.getFullYear();
-        const month = currentDisplayDate.getMonth();
-        const realToday = new Date();
+  function render() {
+    const { y, m } = cur;
+    document.getElementById('month-title').textContent = MONTHS[m];
+    
+    const subMonth = MONTHS[m].slice(0,3).toUpperCase();
+    document.getElementById('subtitle').textContent = `${subMonth} ${now.getDate()}, ${y}`;
 
-        const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-        document.getElementById('monthYear').innerText = `${months[month]} ${year}`;
+    const firstDay = new Date(y, m, 1).getDay();
+    const offset = (firstDay + 6) % 7; 
+    const daysInMonth = new Date(y, m + 1, 0).getDate();
+    
+    const rows = Math.ceil((offset + daysInMonth) / 7);
+    const totalCells = rows * 7; 
 
-        const firstDay = new Date(year, month, 1).getDay();
-        const daysInMonth = new Date(year, month + 1, 0).getDate();
-        const prevMonthLastDay = new Date(year, month, 0).getDate();
+    let html = '';
+    for (let i = 0; i < totalCells; i++) {
+      let content = '';
+      let cls = 'day-cell';
+      const dayNum = i - offset + 1;
 
-        const startOffset = firstDay === 0 ? 6 : firstDay - 1;
-        const grid = document.getElementById('calendarDays');
-        grid.innerHTML = "";
-
-        let html = '<tr>';
+      if (i >= offset && i < offset + daysInMonth) {
+        content = dayNum;
+        cls += ' active';
         
-        // Prev Month
-        for (let i = 0; i < startOffset; i++) {
-            html += `<td class="fade">${prevMonthLastDay - startOffset + i + 1}</td>`;
-        }
+        const isToday = y === now.getFullYear() && m === now.getMonth() && dayNum === now.getDate();
+        if (isToday) cls += ' today';
 
-        // Current Month
-        for (let day = 1; day <= daysInMonth; day++) {
-            if ((day + startOffset - 1) % 7 === 0 && day !== 1) html += '</tr><tr>';
-            
-            const isToday = (day === realToday.getDate() && month === realToday.getMonth() && year === realToday.getFullYear()) ? 'class="today"' : '';
-            html += `<td ${isToday}>${day}</td>`;
+        if (selectedDate && selectedDate.d === dayNum && selectedDate.m === m && selectedDate.y === y) {
+            cls += ' selected';
         }
-
-        // Next Month padding to fill 6 rows
-        let remainingCells = 42 - (daysInMonth + startOffset);
-        for (let i = 1; i <= remainingCells; i++) {
-            if ((daysInMonth + startOffset + i - 1) % 7 === 0) html += '</tr><tr>';
-            html += `<td class="fade">${i}</td>`;
-        }
-
-        grid.innerHTML = html + '</tr>';
+      } else {
+        cls += ' empty';
+      }
+      html += `<div class="${cls}" onclick="selectDay(${dayNum}, ${m}, ${y})">${content}</div>`;
     }
+    document.getElementById('days').innerHTML = html;
+  }
 
-    function changeMonth(step) {
-        currentDisplayDate.setMonth(currentDisplayDate.getMonth() + step);
-        render();
-    }
-
+  window.selectDay = (d, m, y) => {
+    if (!d) return;
+    selectedDate = { d, m, y };
     render();
+  };
+
+  document.getElementById('prev').onclick = () => {
+    cur.m--;
+    if (cur.m < 0) { cur.m = 11; cur.y--; }
+    render();
+  };
+  document.getElementById('next').onclick = () => {
+    cur.m++;
+    if (cur.m > 11) { cur.m = 0; cur.y++; }
+    render();
+  };
+
+  render();
 </script>
 </body>
 </html>
